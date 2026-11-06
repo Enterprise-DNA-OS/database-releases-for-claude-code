@@ -12,11 +12,13 @@
       },
       {
         "title": "Impact and recovery",
-        "sql": "select version, specification->>'impact' as impact, specification->>'recovery' as recovery,digest from versions where change_id=$1 order by version"
+        "sql": "select v.specification->>'impact' as impact,v.specification->>'recovery' as recovery,v.digest from versions v join changes c on c.id=v.change_id and c.version=v.version where c.id=$1",
+        "layout": "record"
       },
       {
         "title": "Rehearsal evidence",
-        "sql": "select v.version,r.operator,r.passed,r.result,r.created_at from rehearsals r join versions v on v.id=r.version_id where v.change_id=$1 order by r.created_at"
+        "sql": "select v.version,r.operator,r.passed,r.result->>'stage' as failed_stage,r.created_at from rehearsals r join versions v on v.id=r.version_id where v.change_id=$1 order by r.created_at",
+        "note": "A passing rehearsal covers the supplied fixture only. Full machine results are retained in the database."
       }
     ]
   },
