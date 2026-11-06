@@ -1,11 +1,43 @@
 [
   {
-    "name": "example",
-    "title": "TODO(author): the first document this industry must produce",
-    "for_each": "select gen_random_uuid() as id, 'Example' as name",
-    "file": "name",
+    "name": "change-review",
+    "title": "Change review record",
+    "for_each": "select id,code from changes order by code",
+    "file": "code",
     "sections": [
-      { "title": "Details", "sql": "select 'replace me' as item, $1::text as record_id" }
+      {
+        "title": "Change",
+        "layout": "record",
+        "sql": "select code,title,environment,owner,due_date,risk,version,state from release_queue where id=$1"
+      },
+      {
+        "title": "Impact and recovery",
+        "sql": "select version, specification->>'impact' as impact, specification->>'recovery' as recovery,digest from versions where change_id=$1 order by version"
+      },
+      {
+        "title": "Rehearsal evidence",
+        "sql": "select v.version,r.operator,r.passed,r.result,r.created_at from rehearsals r join versions v on v.id=r.version_id where v.change_id=$1 order by r.created_at"
+      }
+    ]
+  },
+  {
+    "name": "release-evidence",
+    "title": "Release evidence pack",
+    "for_each": "select id,code from changes order by code",
+    "file": "code",
+    "sections": [
+      {
+        "title": "Decisions",
+        "sql": "select v.version,a.reviewer,a.decision,a.evidence,a.created_at from approvals a join versions v on v.id=a.version_id where v.change_id=$1 order by a.created_at"
+      },
+      {
+        "title": "Deployment outcomes recorded by operators",
+        "sql": "select v.version,d.outcome,d.evidence,d.operator,d.created_at from deployments d join versions v on v.id=d.version_id where v.change_id=$1 order by d.created_at"
+      },
+      {
+        "title": "Notes",
+        "sql": "select note,operator,created_at from notes where change_id=$1 order by created_at"
+      }
     ]
   }
 ]

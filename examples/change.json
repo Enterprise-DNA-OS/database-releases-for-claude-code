@@ -1,0 +1,9 @@
+{
+  "baseline": "create table orders (id integer primary key, reference text not null); insert into orders values (1,'DEMO-01');",
+  "forward": "alter table orders add column dispatched boolean not null default false;",
+  "verify": "select count(*)=1 and bool_and(dispatched=false) as ok from orders;",
+  "rollback": "alter table orders drop column dispatched;",
+  "verify_rollback": "select count(*)=1 and bool_and(reference='DEMO-01') as ok from orders;",
+  "impact": "Adds a dispatch marker. Demo-only fixture. Production baseline and rollback data loss need separate review.",
+  "recovery": "Restore the pre-change backup if new dispatch values must be retained. Rehearsal checks the supplied baseline only."
+}

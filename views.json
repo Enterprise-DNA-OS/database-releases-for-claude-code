@@ -1,13 +1,30 @@
 [
   {
     "name": "week",
-    "title": "This week",
-    "subtitle": "Database Releases for Claude Code: what needs attention, rendered by npm run view",
+    "title": "Database release review",
+    "subtitle": "Read-only snapshot. Rehearsal results cover supplied fixtures only.",
     "sections": [
       {
+        "title": "Release queue",
+        "sql": "select code,title,environment,owner,due_date,state from release_queue order by due_date,code"
+      },
+      {
         "title": "Needs attention",
-        "note": "TODO(author): point this at the industry's attention view (overdue, stuck, quiet).",
-        "sql": "select 'replace me' as item, 'TODO(author)' as why"
+        "sql": "select * from attention order by due_date,code"
+      }
+    ]
+  },
+  {
+    "name": "assurance",
+    "title": "Release evidence gaps",
+    "sections": [
+      {
+        "title": "Configured record checks",
+        "sql": "select * from compliance_gaps order by code,rule"
+      },
+      {
+        "title": "Imported execution types",
+        "sql": "select execution_type,count(*)::int as records from legacy_history group by execution_type order by execution_type"
       }
     ]
   }

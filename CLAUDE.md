@@ -1,43 +1,52 @@
-# Database Releases for Claude Code: operating instructions
+# Database Releases for Claude Code
 
-This file is the brain. Claude Code reads it at the start of every session. It says who this is for, how work gets done, and the one right way to do each recurring job.
+Business: [your business]. Operator: [your name]. Keep the evidence behind each database release together.
 
-## Who this is for
+Read the command matching the job in `.claude/commands`. Every answer starts with the actual CLI. Flags use `--name=value` and every command supports `--json`. `npm run desk -- help` documents syntax.
 
-- **Business:** [YOUR BUSINESS]
-- **Operator:** [YOUR NAME], [your role]
-- **What matters most:** [the one or two outcomes you care about]
+## One route per job
 
-Fill this in once. A worker with context knows. A worker without it guesses.
-
-## How to work
-
-1. **Take a brief, not a script.** The operator describes the outcome. You run the right command and present the answer.
-2. **Read before you write.** Before drafting anything about a record, read its full history first.
-3. **Plain language.** Short sentences. No filler. Numbers in tables.
-4. **Silent success, loud problems.** No play-by-play. Say what broke and what you did about it.
-5. **Stop at the line.** Anything that sends, deletes, or faces a customer waits for a yes in this session.
-
-## Routing table: one right way for each recurring job
-
-| When the operator asks for... | Use this |
+| Job | Recipe |
 |---|---|
-| <!-- TODO(author): one row per slash command --> | `/...` |
+| environments | `.claude/commands/environments.md` |
+| changes | `.claude/commands/changes.md` |
+| show | `.claude/commands/show.md` |
+| release-queue | `.claude/commands/release-queue.md` |
+| approval-inbox | `.claude/commands/approval-inbox.md` |
+| rollback-watch | `.claude/commands/rollback-watch.md` |
+| attention | `.claude/commands/attention.md` |
+| compliance | `.claude/commands/compliance.md` |
+| legacy-history | `.claude/commands/legacy-history.md` |
+| history | `.claude/commands/history.md` |
+| insights | `.claude/commands/insights.md` |
+| add-environment | `.claude/commands/add-environment.md` |
+| add | `.claude/commands/add.md` |
+| revise | `.claude/commands/revise.md` |
+| rehearse | `.claude/commands/rehearse.md` |
+| review | `.claude/commands/review.md` |
+| release-pack | `.claude/commands/release-pack.md` |
+| record-deployment | `.claude/commands/record-deployment.md` |
+| log | `.claude/commands/log.md` |
+| import | `.claude/commands/import.md` |
+| compare-history | `.claude/commands/compare-history.md` |
+| export | `.claude/commands/export.md` |
+| weekly-review | `.claude/commands/weekly-review.md` |
+| draft-review | `.claude/commands/draft-review.md` |
+| customise | `.claude/commands/customise.md` |
+| new-view | `.claude/commands/new-view.md` |
 
-If an ask fits nothing here, run the CLI directly (`npm run <cli> -- --help`) and then propose a new command for it.
+## Operating rules
 
-## Hard rules
+Every mutation records the real requesting operator. Reviewer names must differ from owner and author, but they are asserted identities rather than authenticated signatures. Never invent a reviewer, evidence or an outcome. A database owner can alter records. This is a trusted-operator desk, not tenant access control or tamper-proof evidence storage.
 
-- Never send email or messages from here. Draft to `drafts/`, a person sends.
-- Never delete records without an explicit yes in this session. Prefer marking closed or archived.
-- Never invent a record. If a name is ambiguous, list the candidates and ask.
-- The database is the source of truth. If the answer is not in it, say so.
+The rehearsal worker always uses disposable PGlite. It has no production connection, and its assertions prove only the supplied fixture. Release packs export scripts without executing them. The baseline is a test fixture, not a production setup script. Production changes, backup checks and recovery stay with the authorised deployment process. Never execute a pack without explicit authority and representative staging validation.
 
-## Where things live
+Revisions preserve earlier versions and require a new rehearsal and approval. A repeat rehearsal needs a fresh approval. Failed deployments can later be recorded as rolled back, never silently replaced with success. Imported Liquibase history stays separate and preserves execution types. Investigate conflicting history instead of overwriting it.
 
-- `scripts/` the CLI. `scripts/lib/db.mjs` picks `DATABASE_URL` (Postgres, Supabase) or the embedded database in `.data/`.
-- `supabase/migrations/` the schema, plain SQL. `npm run migrate` applies it.
-- `.claude/commands/` the slash commands. Add one every time the same ask comes twice.
-- `docs/` the thesis and the guide for moving off Liquibase Secure.
+Use docs/compliance.md to separate NIST guidance from local workflow policy. No deletion command exists. Keep personal or production data out of demo fixtures and public repositories. Private inputs belong in ignored imports/, exports/ and release-packs/ folders.
 
-Built by Enterprise DNA. Installed and run for you as part of Omni: https://enterprisedna.co/omni/instead-of/liquibase
+DATABASE_URL selects the desk's Postgres connection. Otherwise PGlite persists in .data/db. npm test ignores production DATABASE_URL and uses temporary embedded data unless TEST_DATABASE_URL explicitly names an empty disposable database. Seed only demos. Back up the database and linked evidence separately and test recovery before cutover.
+
+Never send or publish from this desk. Draft to drafts/. Add schema changes in new migrations, never by rewriting applied files. Use the same command library in Claude Code, Codex, OpenCode and Cursor.
+
+Omni by Enterprise DNA customises and operates this system. One setup fee, then a retainer.
